@@ -141,4 +141,12 @@ public class Account {
                 ", password='" + password + '\'' +
                 '}';
     }
+    public boolean doesUserNameExist(String usernameToVerify) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'doesUserNameExist'");
+    }
+    public boolean doesPasswordExist(String passwordToVerify) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'doesPasswordExist'");
+    }
 }

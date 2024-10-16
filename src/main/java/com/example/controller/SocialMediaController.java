@@ -52,36 +52,24 @@ public class SocialMediaController {
         }
         else return ResponseEntity.status(400).body(null);
         
-    }
-
-    // @PostMapping("/register")
-    // public ResponseEntity<String> createAccount(
-    //         @RequestParam String username,
-    //         @RequestParam String password
-    // ){
-    //     List<Account> accountList = accountRepository.findAll();
-    //     if(username.length() > 0 && password.length() > 0 && password.length() < 255){
-    //         accountList.add(new Account(username,password));
-            
-    //         return ResponseEntity.status(200).body("Account created successfully");
-    //     }
-    //     // Check if userName already exists
-    //     else if(accountList.accountRepository.existsByUsername(username)){
-    //         return ResponseEntity.status(409).body("Username already exists");
-    //     }
-    //     else return ResponseEntity.status(400).body("Some other error");
-        
-    // }
-    
+    }    
 
     @PostMapping("/login")
-    public Account verifyAccount(@RequestBody Account verifiedAccount){
-        return verifiedAccount;
+    @ResponseBody
+    public ResponseEntity<Account> verifyAccount(@RequestBody Account accountToVerify){
+        String usernameToVerify = accountToVerify.getUsername();
+        String passwordToVerify = accountToVerify.getPassword();
+        if(accountService.doesUserNameExist(usernameToVerify) == true && accountService.doesPasswordExist(passwordToVerify) == true){
+            return ResponseEntity.status(200).body(accountService.loginAccount(accountToVerify));
+        }
+        
+        return ResponseEntity.status(401).body(null);
     }
 
 
     @PostMapping("/messages")
-    public @ResponseBody ResponseEntity<Message> createMessage(@RequestBody Message newMessage){
+    @ResponseBody
+    public  ResponseEntity<Message> createMessage(@RequestBody Message newMessage){
         Integer addedMessageLength = newMessage.getMessageText().length();
         Integer addeMessagePostedBy = newMessage.getPostedBy();
         //Check message length restictions and if the postedBy matches an accountId
@@ -100,7 +88,7 @@ public class SocialMediaController {
 
 
     @GetMapping("/messages/{messageId}")
-    public @ResponseBody ResponseEntity <Message> getMessageById(@PathVariable Integer messageId){
+    public @ResponseBody ResponseEntity <Message> getMessageById(@PathVariable ("messageId") Integer messageId){
         Message retrievedMessage = messageService.getMessageById(messageId);
         return ResponseEntity.status(200).body(retrievedMessage);
     }
@@ -108,33 +96,35 @@ public class SocialMediaController {
 
     
     @DeleteMapping("/messages/{messageId}")
-    public @ResponseBody ResponseEntity<String> deleteMessage(@PathVariable Integer messageId){
+    public @ResponseBody ResponseEntity<Integer> deleteMessage(@PathVariable ("messageId") Integer messageId){
          if(messageService.getMessageById(messageId) != null){
             messageService.deleteMessage(messageId);
-            return ResponseEntity.status(200).body(null);
+            return ResponseEntity.status(200).body(messageService.deleteMessage(messageId));
          }
          return ResponseEntity.status(200).body(null);
     }
     
 
     @PatchMapping("/messages/{messageId}")
-    public @ResponseBody ResponseEntity<String> updateMessageText(@PathVariable Integer messageId, @RequestParam String messageText){
-        if(messageService.getMessageById(messageId) != null && messageText.length() > 0 && messageText.length() < 255){
-            messageService.updateMessageText(messageId, messageText);
-            return ResponseEntity.status(200).body(null);
-        }
-        return ResponseEntity.status(400).body("Message cannot be created");
+    @ResponseBody
+    public  ResponseEntity<Integer> updateMessageText(
+        @PathVariable ("messageId") Integer messageId, 
+         @RequestBody String messageText){
+            if(messageService.getMessageById(messageId) != null && 
+            messageText.length() > 0 && 
+            messageText.length() < 255){
+                messageService.updateMessageText(messageId, messageText);
+                return ResponseEntity.status(200).body(messageService.updateMessageText(messageId, messageText));
+            }
+        return ResponseEntity.status(400).body(0);
 
     }
 
 
     @GetMapping("accounts/{accountId}/messages")
-    public @ResponseBody ResponseEntity <List<Message>> getAllMessagesByAccount(PathVariable accountId){
-        List<Message> allMessagesByAccount = messageService.(accountId);
+    public @ResponseBody ResponseEntity <List<Message>> getAllMessagesByAccount(@PathVariable ("accountId") Integer accountId){
+        List<Message> allMessagesByAccount = messageService.getMessagesByAccount(accountId);
         return ResponseEntity.status(200).body(allMessagesByAccount);
     }
-
-
-
 
 }

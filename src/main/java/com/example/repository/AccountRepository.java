@@ -7,4 +7,6 @@ import com.example.entity.Account;
 @Repository
 public interface AccountRepository extends CrudRepository<Account, Integer> {
     Boolean existsByUsername(String username);
+    Boolean existsByPassword(String password);
+    Account findByUsernameAndPassword(String username, String password);
 }

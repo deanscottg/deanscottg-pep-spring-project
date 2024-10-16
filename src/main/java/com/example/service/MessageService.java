@@ -4,7 +4,6 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,20 +38,23 @@ public class MessageService {
 
     }
 
-    public void deleteMessage(Integer messageId){
+    public Integer deleteMessage(Integer messageId){
         Optional <Message> messageToDelete = messageRepository.findById(messageId);
         if(messageToDelete.isPresent()){
             messageRepository.deleteById(messageId);
         }
+        return 1;
     }
 
-    public void updateMessageText(Integer messageId, String messageText){
+    public Integer updateMessageText(Integer messageId, String messageText){
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
-        if(optionalMessage.isPresent() && optionalMessage.get().getMessageText().length() > 255){
+        if(optionalMessage.isPresent() && messageText.length() < 255 && messageText.length() > 0){
             Message updatedMessage = optionalMessage.get();
             updatedMessage.setMessageText(messageText);
             messageRepository.save(updatedMessage);
+            return 1;
             }
+            else return 0;
         }
 
     public List<Message> getMessagesByAccount(Integer accountId){
