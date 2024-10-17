@@ -46,15 +46,17 @@ public class MessageService {
         return 1;
     }
 
-    public Integer updateMessageText(Integer messageId, String messageText){
+    public Integer updateMessageText(Integer messageId, Message messageToUpdate){
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
-        if(optionalMessage.isPresent() && messageText.length() < 255 && messageText.length() > 0){
-            Message updatedMessage = optionalMessage.get();
-            updatedMessage.setMessageText(messageText);
-            messageRepository.save(updatedMessage);
-            return 1;
-            }
-            else return 0;
+        if(optionalMessage.isPresent() && 
+            messageToUpdate.getMessageText().length() < 255 && 
+            messageToUpdate.getMessageText() != ""){
+                Message updatedMessage = optionalMessage.get();
+                updatedMessage.setMessageText(messageToUpdate.getMessageText());
+                messageRepository.save(updatedMessage);
+                return 1;
+                }
+            else return null;
         }
 
     public List<Message> getMessagesByAccount(Integer accountId){

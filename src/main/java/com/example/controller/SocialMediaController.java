@@ -3,7 +3,6 @@ package com.example.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,13 +42,12 @@ public class SocialMediaController {
         Integer newPasswordLength = newAccount.getPassword().length();
         if(newUserNameLength > 0 && newPasswordLength > 4 && !accountService.doesUserNameExist(newAccount.getUsername())){
             Account verifiedAccount = accountService.registerAccount(newAccount);
-            return ResponseEntity.status(200).body(verifiedAccount);
+            return ResponseEntity.ok().body(verifiedAccount);
         }
         else if(accountService.doesUserNameExist(newAccount.getUsername())){
             return ResponseEntity.status(409).body(null);
-
         }
-        else return ResponseEntity.status(400).body(null);
+        else return ResponseEntity.badRequest().body(null);
         
     }    
 
@@ -60,7 +57,7 @@ public class SocialMediaController {
         String usernameToVerify = accountToVerify.getUsername();
         String passwordToVerify = accountToVerify.getPassword();
         if(accountService.doesUserNameExist(usernameToVerify) == true && accountService.doesPasswordExist(passwordToVerify) == true){
-            return ResponseEntity.status(200).body(accountService.loginAccount(accountToVerify));
+            return ResponseEntity.ok().body(accountService.loginAccount(accountToVerify));
         }
         
         return ResponseEntity.status(401).body(null);
@@ -75,33 +72,30 @@ public class SocialMediaController {
         //Check message length restictions and if the postedBy matches an accountId
         if(addedMessageLength > 0 && addedMessageLength < 255 && accountService.findAccountById(addeMessagePostedBy) != null){
             messageService.addMessage(newMessage);
-            return ResponseEntity.status(200).body(newMessage);
+            return ResponseEntity.ok().body(newMessage);
         }
-        return ResponseEntity.status(400).body(null);
+        return ResponseEntity.badRequest().body(null);
     }
 
     @GetMapping("/messages")
     public @ResponseBody ResponseEntity <List<Message>> getAllMessages(){
         List<Message> allMessages = messageService.getAllMessages();
-        return ResponseEntity.status(200).body(allMessages);
+        return ResponseEntity.ok().body(allMessages);
     }
-
 
     @GetMapping("/messages/{messageId}")
     public @ResponseBody ResponseEntity <Message> getMessageById(@PathVariable ("messageId") Integer messageId){
         Message retrievedMessage = messageService.getMessageById(messageId);
-        return ResponseEntity.status(200).body(retrievedMessage);
+        return ResponseEntity.ok().body(retrievedMessage);
     }
         
-
-    
     @DeleteMapping("/messages/{messageId}")
     public @ResponseBody ResponseEntity<Integer> deleteMessage(@PathVariable ("messageId") Integer messageId){
          if(messageService.getMessageById(messageId) != null){
             messageService.deleteMessage(messageId);
-            return ResponseEntity.status(200).body(messageService.deleteMessage(messageId));
+            return ResponseEntity.ok().body(messageService.deleteMessage(messageId));
          }
-         return ResponseEntity.status(200).body(null);
+         return ResponseEntity.ok().body(null);
     }
     
 
@@ -109,22 +103,22 @@ public class SocialMediaController {
     @ResponseBody
     public  ResponseEntity<Integer> updateMessageText(
         @PathVariable ("messageId") Integer messageId, 
-         @RequestBody String messageText){
+        @RequestBody Message messageToUpdate){
+            
             if(messageService.getMessageById(messageId) != null && 
-            messageText.length() > 0 && 
-            messageText.length() < 255){
-                messageService.updateMessageText(messageId, messageText);
-                return ResponseEntity.status(200).body(messageService.updateMessageText(messageId, messageText));
+            messageToUpdate.getMessageText() !="" && 
+            messageToUpdate.getMessageText().length() < 255){
+                messageService.updateMessageText(messageId, messageToUpdate);
+                return ResponseEntity.ok().body(messageService.updateMessageText(messageId, messageToUpdate));
             }
-        return ResponseEntity.status(400).body(0);
-
+        return ResponseEntity.badRequest().body(0);
     }
 
 
     @GetMapping("accounts/{accountId}/messages")
     public @ResponseBody ResponseEntity <List<Message>> getAllMessagesByAccount(@PathVariable ("accountId") Integer accountId){
         List<Message> allMessagesByAccount = messageService.getMessagesByAccount(accountId);
-        return ResponseEntity.status(200).body(allMessagesByAccount);
+        return ResponseEntity.ok().body(allMessagesByAccount);
     }
 
 }
