@@ -21,23 +21,26 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
+         // Create a message
     public Message addMessage(Message message){
         return messageRepository.save(message);
     }
-   
+
+        // Retrieve all messages
     public List<Message> getAllMessages(){
         return  (List<Message>) messageRepository.findAll();
     }
 
+        // Retrieve a message from a particular account
     public Message getMessageById(Integer messageId) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if(optionalMessage.isPresent()){
             return optionalMessage.get();
         }
         else return null;
-
     }
 
+        // Delete a message given by its id
     public Integer deleteMessage(Integer messageId){
         Optional <Message> messageToDelete = messageRepository.findById(messageId);
         if(messageToDelete.isPresent()){
@@ -46,6 +49,7 @@ public class MessageService {
         return 1;
     }
 
+        // Given a new message, replace the message text and update it
     public Integer updateMessageText(Integer messageId, Message messageToUpdate){
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if(optionalMessage.isPresent() && 
@@ -58,11 +62,11 @@ public class MessageService {
                 }
             else return null;
         }
-
+        
+            // Retrieve all messages from a given account
     public List<Message> getMessagesByAccount(Integer accountId){
         List<Message> messagesByAccount = messageRepository.findByPostedBy(accountId);
         return messagesByAccount;
     }
 
-    
 }

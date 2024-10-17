@@ -38,12 +38,12 @@ public class SocialMediaController {
 
     @PostMapping("/register")
     public @ResponseBody ResponseEntity<Account> createAccount( @RequestBody Account newAccount){
-        Integer newUserNameLength = newAccount.getUsername().length();
-        Integer newPasswordLength = newAccount.getPassword().length();
-        if(newUserNameLength > 0 && newPasswordLength > 4 && !accountService.doesUserNameExist(newAccount.getUsername())){
-            Account verifiedAccount = accountService.registerAccount(newAccount);
-            return ResponseEntity.ok().body(verifiedAccount);
-        }
+        if( newAccount.getUsername().length() > 0 && 
+            newAccount.getPassword().length() > 4 && 
+            !accountService.doesUserNameExist(newAccount.getUsername())){
+                Account verifiedAccount = accountService.registerAccount(newAccount);
+                return ResponseEntity.ok().body(verifiedAccount);
+         }
         else if(accountService.doesUserNameExist(newAccount.getUsername())){
             return ResponseEntity.status(409).body(null);
         }
@@ -54,23 +54,19 @@ public class SocialMediaController {
     @PostMapping("/login")
     @ResponseBody
     public ResponseEntity<Account> verifyAccount(@RequestBody Account accountToVerify){
-        String usernameToVerify = accountToVerify.getUsername();
-        String passwordToVerify = accountToVerify.getPassword();
-        if(accountService.doesUserNameExist(usernameToVerify) == true && accountService.doesPasswordExist(passwordToVerify) == true){
+        if( accountService.doesUserNameExist(accountToVerify.getUsername()) == true && 
+            accountService.doesPasswordExist(accountToVerify.getPassword()) == true){
             return ResponseEntity.ok().body(accountService.loginAccount(accountToVerify));
         }
-        
         return ResponseEntity.status(401).body(null);
     }
-
 
     @PostMapping("/messages")
     @ResponseBody
     public  ResponseEntity<Message> createMessage(@RequestBody Message newMessage){
-        Integer addedMessageLength = newMessage.getMessageText().length();
-        Integer addeMessagePostedBy = newMessage.getPostedBy();
-        //Check message length restictions and if the postedBy matches an accountId
-        if(addedMessageLength > 0 && addedMessageLength < 255 && accountService.findAccountById(addeMessagePostedBy) != null){
+        if( newMessage.getMessageText().length() > 0 && 
+            newMessage.getMessageText().length() < 255 && 
+            accountService.findAccountById(newMessage.getPostedBy()) != null){
             messageService.addMessage(newMessage);
             return ResponseEntity.ok().body(newMessage);
         }
@@ -98,13 +94,11 @@ public class SocialMediaController {
          return ResponseEntity.ok().body(null);
     }
     
-
     @PatchMapping("/messages/{messageId}")
     @ResponseBody
     public  ResponseEntity<Integer> updateMessageText(
         @PathVariable ("messageId") Integer messageId, 
         @RequestBody Message messageToUpdate){
-            
             if(messageService.getMessageById(messageId) != null && 
             messageToUpdate.getMessageText() !="" && 
             messageToUpdate.getMessageText().length() < 255){
@@ -114,11 +108,9 @@ public class SocialMediaController {
         return ResponseEntity.badRequest().body(0);
     }
 
-
     @GetMapping("accounts/{accountId}/messages")
     public @ResponseBody ResponseEntity <List<Message>> getAllMessagesByAccount(@PathVariable ("accountId") Integer accountId){
         List<Message> allMessagesByAccount = messageService.getMessagesByAccount(accountId);
         return ResponseEntity.ok().body(allMessagesByAccount);
     }
-
 }
